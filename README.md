@@ -133,6 +133,4 @@ export ALERT_SMS_TARGET="2165551234@vtext.com"
 
 ## 🛡️ Risk & System Architecture Disclaimer
 
-```text
 This software repository represents an automated analytical framework built for educational, diagnostic, and risk-management research engineering purposes. It does not constitute financial advice, investment recommendations, or trade solicitation. Options trading involves substantial risk, margin maintenance hazards, and financial variance liabilities. Always verify JSON file output payloads against manual contract variables before mapping to execution brokers.
-```
