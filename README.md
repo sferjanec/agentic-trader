@@ -40,14 +40,12 @@ The environment is strictly decoupled into three distinct structural modules to 
          💾 trading_ledger.db (SQLite)
          • Row Audit & Distance Caching
 
-```
-
 1. ** The Tactical Options Screening Desk (`options_screener.py`):** Runs concurrently across the S&P 100 via a 15-thread worker pool. Filters the universe using pure non-token mathematical gates (14-day RSI exhaustion, out-of-the-money open interest, and strict $-0.20$ Delta tracking boundaries) to isolate high-yield premium opportunities.
 2. ** The Multi-Agent Orchestration Crew (`options_pipeline.py`):** An advanced CrewAI infrastructure that coordinates specialized AI agents (Equity Analyst, Macro Risk Controller, and Options Execution Engineer) to parse narrative news sentiment, check VIX thresholds, mitigate earnings landmines, and synthesize structural strategy markdown blueprints.
 3. ** The Algorithmic JSON Ticket & Ledger Engine (`database_manager.py`):** Converts the crew's strategic output into a production-grade, sanitized multi-leg JSON execution payload, automatically updating real-time system clocks and committing parameters directly into a relational SQLite local database table (`trading_ledger.db`).
 4. ** The Intraday Velocity Radar (`run_intraday_radar.py` & `intraday_desk.py`):** An automated market-hours utility that scans assets for momentum breakouts crossing a $\pm3.5\%$ threshold and immediately runs intraday geometry tracking to calculate institutional pivot floors, resistance profit targets, and protective volatility ATR stops.
 
----
+```
 
 ## 💻 Ubuntu / WSL2 Environment Setup Instructions
 
