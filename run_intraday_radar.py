@@ -1,6 +1,9 @@
 import os
 import sys
 import time
+import random
+import argparse
+from datetime import datetime
 import yfinance as yf
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
@@ -13,7 +16,6 @@ def check_velocity(ticker):
     """
     try:
         stock = yf.Ticker(ticker)
-        # Fetch minimum footprint data to optimize connection speed
         df = stock.history(period="2d")
         if df.empty or len(df) < 2:
             return None
@@ -21,7 +23,6 @@ def check_velocity(ticker):
         prev_close = df['Close'].iloc[-2]
         current_spot = df['Close'].iloc[-1]
         
-        # Calculate intraday distance rate change
         pct_change = ((current_spot - prev_close) / prev_close) * 100
         
         return {
@@ -32,41 +33,70 @@ def check_velocity(ticker):
     except Exception:
         return None
 
-if __name__ == "__main__":
-    print("🚀 Initializing Live Intraday Momentum Radar...")
-    
-    # Ingest your existing S&P text file
+def execute_radar_sweep():
+    """Performs a single multi-threaded pass across the constituent nodes."""
     with open("sp100_constituents.txt", "r") as f:
         tickers = [t.strip().upper() for t in f.read().split(",") if t.strip()]
         
-    print(f"Scanning {len(tickers)} assets concurrently for high-velocity swings...")
-    start = time.time()
-    
     movers = []
     with ThreadPoolExecutor(max_workers=15) as executor:
         results = executor.map(check_velocity, tickers)
         for r in results:
-            if r is not None:
-                # Isolate high-momentum swings (Moving up or down more than 3.5%)
-                if abs(r["Change_PCT"]) >= 3.5:
-                    movers.append(r)
-                    
-    print(f"⏱️ Scan complete in {time.time() - start:.2f} seconds.")
+            if r is not None and abs(r["Change_PCT"]) >= 3.5:
+                movers.append(r)
+    return movers
+
+if __name__ == "__main__":
+    # --- COMMAND LINE ARGUMENT ROUTING MATRIX ---
+    parser = argparse.ArgumentParser(description="Autonomous Intraday Velocity Streaming Radar")
+    parser.add_argument(
+        "--interval", 
+        type=int, 
+        default=60, 
+        help="Base runtime loop cooldown delay window mapped in seconds (Default: 60)"
+    )
+    args = parser.parse_args()
     
-    if not movers:
-        print("📊 Market is currently balancing sideways. No assets crossed the ±3.5% momentum threshold.")
+    base_interval = args.interval
+    print("🛰️  Initializing Stream Infrastructure for Intraday Options/Equity Radar...")
+    print(f"⚙️  Configuration: Base scanning loop set to {base_interval} seconds.\n")
+    time.sleep(2) # Brief pause to allow log verification before terminal wipes
+    
+    try:
+        while True:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f"🔄 [SCAN CYCLE TRIGGERED] - System Clock: {timestamp}")
+            print("Scanning S&P universe for high-velocity momentum breakout signals (±3.5%)...\n")
+            
+            start_time = time.time()
+            movers = execute_radar_sweep()
+            scan_duration = time.time() - start_time
+            
+            if not movers:
+                print(f"📊 Market Balance Stable. No symbols currently cross volatility targets.")
+                print(f"⏱️  Network sweep time: {scan_duration:.2f}s")
+            else:
+                movers_df = pd.DataFrame(movers).sort_values(by="Change_PCT", ascending=False).reset_index(drop=True)
+                print(f"🔥 ACTIVE VELOCITY LEADERS (Scan completed in {scan_duration:.2f}s):")
+                print(movers_df.to_string(index=False))
+                print("=========================================================================\n")
+                
+                top_target = movers_df.iloc[0]['Ticker']
+                print(f"🎯 Top opportunity identified: '{top_target}'. Injecting to Execution Desk...\n")
+                
+                trade_plan = calculate_intraday_geometry(top_target)
+                print(trade_plan)
+                
+            # Anti-Throttling Jitter Offset Calculation: Adds a small, variable buffer 
+            # to prevent rhythmic signature patterns on host firewalls
+            jitter = random.randint(5, 15)
+            total_cooldown = base_interval + jitter
+            
+            print(f"\n💤 Entering stream cooldown for {total_cooldown} seconds (Interval: {base_interval}s + Jitter: {jitter}s)...")
+            time.sleep(total_cooldown)
+            
+    except KeyboardInterrupt:
+        print("\n🛑 Intraday Stream Scanner terminated cleanly by user request. Exiting.")
         sys.exit(0)
-        
-    # Display the active velocity targets
-    movers_df = pd.DataFrame(movers).sort_values(by="Change_PCT", ascending=False).reset_index(drop=True)
-    print("\n🔥 HIGH-VELOCITY ACTIVE MOVERS LEADERS:")
-    print(movers_df.to_string(index=False))
-    print("=========================================================================\n")
-    
-    # Process the top opportunity automatically through your intraday math desk
-    top_target = movers_df.iloc[0]['Ticker']
-    print(f"🎯 Automatically routing top momentum candidate '{top_target}' to Intraday Execution Desk...\n")
-    
-    # Run your geometry engine logic directly from memory
-    trade_plan = calculate_intraday_geometry(top_target)
-    print(trade_plan)
