@@ -8,6 +8,7 @@ import yfinance as yf
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from intraday_desk import calculate_intraday_geometry
+from notifier import send_text_alert
 
 def check_velocity(ticker):
     """
@@ -85,6 +86,9 @@ if __name__ == "__main__":
                 
                 top_target = movers_df.iloc[0]['Ticker']
                 print(f"🎯 Top opportunity identified: '{top_target}'. Injecting to Execution Desk...\n")
+                
+                # --- NEW NOTIFICATION LAYER HOOK ---
+                send_text_alert(top_target, top_change, top_price)
                 
                 trade_plan = calculate_intraday_geometry(top_target)
                 print(trade_plan)
