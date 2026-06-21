@@ -2,4 +2,5 @@ venv/
 __pycache__/
 *.db
 options_entry_blueprint.md
+final_trading_directive.md
 order_routing_ticket.json
