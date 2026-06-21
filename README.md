@@ -49,6 +49,7 @@ Follow this execution checklist to coordinate your active trading configurations
  **Audit Open Ledger Risk:** Check for expiring or vulnerable options contracts that require early exit or rolling maneuvers before the opening bell chaos:
   ```bash
   sqlite3 trading_ledger.db "SELECT ticker, strategy, short_strike, expiration_date FROM option_tickets WHERE (julianday(expiration_date) - julianday('now')) <= 7;"
+  ```
 
   Target Core Watchlist: Update your hand-curated watchlist.txt file with any structural equity tickers you intend to analyze for long-term or swing-trade positions.
 
